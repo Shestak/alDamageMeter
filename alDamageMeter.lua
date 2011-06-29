@@ -350,7 +350,9 @@ local SetMode = function(mode)
 		v:Hide()
 	end
 	UpdateBars()
-	MainFrame.title:SetText(sMode)
+	if not hidetitle then
+		MainFrame.title:SetText(sMode)
+	end
 end
 
 local CreateMenu = function(self, level)
@@ -545,16 +547,17 @@ end
 
 local OnEvent = function(self, event, ...)
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = select(1,...)
+		local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
+
 		if band(sourceFlags, filter) == 0 and band(destFlags, filter) == 0 then return end
 		if eventType=="SWING_DAMAGE" or eventType=="RANGE_DAMAGE" or eventType=="SPELL_DAMAGE" or eventType=="SPELL_PERIODIC_DAMAGE" or eventType=="DAMAGE_SHIELD" then
-			local amount, _, _, _, _, absorbed = select(eventType=="SWING_DAMAGE" and 10 or 13, ...)
-			local spellName = eventType=="SWING_DAMAGE" and MELEE_ATTACK or select(11, ...)
+			local amount, _, _, _, _, absorbed = select(eventType=="SWING_DAMAGE" and 12 or 15, ...)
+			local spellName = eventType=="SWING_DAMAGE" and MELEE_ATTACK or select(13, ...)
 			if IsFriendlyUnit(sourceGUID) and not IsFriendlyUnit(destGUID) and combatstarted then
 				if amount and amount > 0 then
 					sourceGUID = owners[sourceGUID] or sourceGUID
 					Add(sourceGUID, amount, DAMAGE, spellName, destName)
-					if not bossname and boss.BossIDs[tonumber(destGUID:sub(9, 12), 16)] then
+					if not bossname and boss.BossIDs[tonumber(destGUID:sub(11, 14), 16)] then
 						bossname = destName
 					elseif not mobname then
 						mobname = destName
@@ -568,7 +571,7 @@ local OnEvent = function(self, event, ...)
 				end
 			end
 		elseif eventType=="SWING_MISSED" or eventType=="RANGE_MISSED" or eventType=="SPELL_MISSED" or eventType=="SPELL_PERIODIC_MISSED" then
-			local misstype, amount = select(eventType=="SWING_MISSED" and 10 or 13, ...)
+			local misstype, amount = select(eventType=="SWING_MISSED" and 12 or 15, ...)
 			if misstype == "ABSORB" and IsFriendlyUnit(destGUID) then
 				local shielder, shield = FindShielder(destGUID, timestamp)
 				if shielder and amount and amount > 0 then
@@ -582,7 +585,7 @@ local OnEvent = function(self, event, ...)
 				owners[destGUID] = sourceGUID
 			end
 		elseif eventType=="SPELL_HEAL" or eventType=="SPELL_PERIODIC_HEAL" then
-			spellId, spellName, spellSchool, amount, over, school, resist = select(10, ...)
+			spellId, spellName, spellSchool, amount, over, school, resist = select(12, ...)
 			if IsFriendlyUnit(sourceGUID) and IsFriendlyUnit(destGUID) and combatstarted then
 				over = over or 0
 				if amount and amount > 0 then
@@ -591,7 +594,7 @@ local OnEvent = function(self, event, ...)
 				end
 			end
 		elseif eventType=="SPELL_DISPEL" then
-			if IsFriendlyUnit(sourceGUID) and combatstarted then
+			if IsFriendlyUnit(sourceGUID) and IsFriendlyUnit(destGUID) and combatstarted then
 				sourceGUID = owners[sourceGUID] or sourceGUID
 				Add(sourceGUID, 1, DISPELS, "Dispel", destName)
 			end
@@ -601,7 +604,7 @@ local OnEvent = function(self, event, ...)
 				Add(sourceGUID, 1, INTERRUPTS, "Interrupt", destName)
 			end
 		elseif eventType=="SPELL_AURA_APPLIED" or eventType=="SPELL_AURA_REFRESH" then
-			local spellId, spellName = select(10, ...)
+			local spellId, spellName = select(12, ...)
 			sourceGUID = owners[sourceGUID] or sourceGUID
 			if AbsorbSpellDuration[spellId] and IsFriendlyUnit(sourceGUID) and IsFriendlyUnit(destGUID) then
 				shields[destGUID] = shields[destGUID] or {}
@@ -609,7 +612,7 @@ local OnEvent = function(self, event, ...)
 				shields[destGUID][spellName][sourceGUID] = timestamp + AbsorbSpellDuration[spellId]
 			end
 		elseif eventType=="SPELL_AURA_REMOVED" then
-			local spellId, spellName = select(10, ...)
+			local spellId, spellName = select(12, ...)
 			sourceGUID = owners[sourceGUID] or sourceGUID
 			if AbsorbSpellDuration[spellId] and IsFriendlyUnit(destGUID) then
 				if shields[destGUID] and shields[destGUID][spellName] and shields[destGUID][spellName][destGUID] then
@@ -644,13 +647,14 @@ local OnEvent = function(self, event, ...)
 			MainFrame:SetScript("OnMouseWheel", OnMouseWheel)
 			MainFrame:Show()
 			UIDropDownMenu_Initialize(menuFrame, CreateMenu, "MENU")
-			MainFrame.title = CreateFS(MainFrame)
-			MainFrame.title:SetPoint("BOTTOMLEFT", MainFrame, "TOPLEFT", 0, 4)
-			MainFrame.title:SetText(sMode)
 			CheckRoster()
 		end
 	elseif event == "VARIABLES_LOADED" then
-		if hidetitle then MainFrame.title:Hide() end
+		if not hidetitle then
+			MainFrame.title = CreateFS(MainFrame)
+			MainFrame.title:SetPoint("BOTTOMLEFT", MainFrame, "TOPLEFT", 0, 4)
+			MainFrame.title:SetText(sMode)
+		end
 		MainFrame:SetSize(width, height)
 	elseif event == "RAID_ROSTER_UPDATE" or event == "PARTY_MEMBERS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
 		CheckRoster()
