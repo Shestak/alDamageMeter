@@ -15,6 +15,7 @@ local font_style = C.font.stylization_font_style
 local font_size = C.font.stylization_font_size
 local hidetitle = true
 local classcolorbar = true
+local onlyboss = false
 local classcolorname = false
 local mergeHealAbsorbs = true
 -- Config end
@@ -24,7 +25,7 @@ local boss = LibStub("LibBossIDs-1.0")
 local band = bit.band
 local bossname, mobname = nil, nil
 local units, bar, barguids, owners = {}, {}, {}, {}
-local current, display, fights = {}, {}, {}
+local current, total, display, fights = {}, {}, {}, {}
 local timer, num, offset = 0, 0, 0
 local MainFrame
 local combatstarted = false
@@ -283,13 +284,19 @@ end
 local Add = function(uGUID, amount, mode, spell, target)
 	if not current[uGUID] then
 		current[uGUID] = CreateUnitInfo(uGUID)
-		--total[uGUID] = CreateUnit(uGUID)
 		tinsert(barguids, uGUID)
 	end
+	if not total[uGUID] then
+		total[uGUID] = CreateUnitInfo(uGUID)
+	end
 	current[uGUID][mode].amount = current[uGUID][mode].amount + amount
-	if spell then current[uGUID][mode].spells[spell] = (current[uGUID][mode].spells[spell] or 0) + amount end
-	if spell then current[uGUID][mode].targets[target] = (current[uGUID][mode].targets[target] or 0) + amount end
-	--total[uGUID][mode] = total[uGUID][mode] + amount
+	total[uGUID][mode].amount = total[uGUID][mode].amount + amount
+	if spell then
+		current[uGUID][mode].spells[spell] = (current[uGUID][mode].spells[spell] or 0) + amount
+		current[uGUID][mode].targets[target] = (current[uGUID][mode].targets[target] or 0) + amount
+		total[uGUID][mode].spells[spell] = (total[uGUID][mode].spells[spell] or 0) + amount
+		total[uGUID][mode].targets[target] = (total[uGUID][mode].targets[target] or 0) + amount
+	end
 end
 
 local SortMethod = function(a, b)
@@ -339,7 +346,7 @@ end
 local Clean = function()
 	numfights = 0
 	wipe(current)
-	--wipe(total)
+	wipe(total)
 	wipe(fights)
 	ResetDisplay(current)
 end
@@ -411,11 +418,11 @@ local CreateMenu = function(self, level)
 			info.func = function() ResetDisplay(current) end
 			info.notCheckable = 1
 			UIDropDownMenu_AddButton(info, level)
-			--[[wipe(info)
+			wipe(info)
 			info.text = "Total"
 			info.func = function() ResetDisplay(total) end
 			info.notCheckable = 1
-			UIDropDownMenu_AddButton(info, level)]]
+			UIDropDownMenu_AddButton(info, level)
 			for i, v in pairs(fights) do
 				wipe(info)
 				info.text = v.name
@@ -497,6 +504,11 @@ local OnUpdate = function(self, elapsed)
 				v.combatTime = v.combatTime + timer
 			end
 		end
+		for i, v in pairs(total) do
+			if IsUnitInCombat(i) then
+				v.combatTime = v.combatTime + timer
+			end
+		end
 		UpdateBars()
 		if not InCombatLockdown() and not IsRaidInCombat() then
 			EndCombat()
@@ -548,7 +560,6 @@ end
 local OnEvent = function(self, event, ...)
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
-
 		if band(sourceFlags, filter) == 0 and band(destFlags, filter) == 0 then return end
 		if eventType=="SWING_DAMAGE" or eventType=="RANGE_DAMAGE" or eventType=="SPELL_DAMAGE" or eventType=="SPELL_PERIODIC_DAMAGE" or eventType=="DAMAGE_SHIELD" then
 			local amount, _, _, _, _, absorbed = select(eventType=="SWING_DAMAGE" and 12 or 15, ...)
@@ -559,7 +570,7 @@ local OnEvent = function(self, event, ...)
 					Add(sourceGUID, amount, DAMAGE, spellName, destName)
 					if not bossname and boss.BossIDs[tonumber(destGUID:sub(11, 14), 16)] then
 						bossname = destName
-					elseif not mobname then
+					elseif not mobname and not onlyboss then
 						mobname = destName
 					end
 				end
