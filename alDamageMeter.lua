@@ -1,4 +1,4 @@
-local T, C, L = unpack(ShestakUI)
+﻿local T, C, L = unpack(ShestakUI)
 
 -- Config start
 local anchor = "LEFT"
@@ -6,7 +6,7 @@ local x, y = 23, 0
 local barheight = 12
 local spacing = 7
 local maxbars = 7
-local width, height = 213, maxbars*(barheight+spacing)-spacing
+local width, height = 213, maxbars * (barheight + spacing) - spacing
 local maxfights = 10
 local reportstrings = 10
 local texture = C.media.texture
@@ -31,7 +31,7 @@ local MainFrame
 local combatstarted = false
 local raidFlags = COMBATLOG_OBJECT_AFFILIATION_RAID + COMBATLOG_OBJECT_AFFILIATION_PARTY + COMBATLOG_OBJECT_AFFILIATION_MINE
 local petFlags = COMBATLOG_OBJECT_TYPE_PET + COMBATLOG_OBJECT_TYPE_GUARDIAN
-local npcFlags = COMBATLOG_OBJECT_TYPE_NPC+COMBATLOG_OBJECT_CONTROL_NPC
+local npcFlags = COMBATLOG_OBJECT_TYPE_NPC + COMBATLOG_OBJECT_CONTROL_NPC
 local displayMode = {
 	DAMAGE,
 	SHOW_COMBAT_HEALING,
@@ -42,30 +42,29 @@ local displayMode = {
 local sMode = DAMAGE
 local AbsorbSpellDuration = {
 	-- Death Knight
-	[48707] = 5,	-- Anti-Magic Shell (DK) Rank 1 -- Does not currently seem to show tracable combat log events. It shows energizes which do not reveal the amount of damage absorbed
-	[51052] = 10,	-- Anti-Magic Zone (DK)( Rank 1 (Correct spellID?)
-	[51271] = 20,	-- Unbreakable Armor (DK)
-	[77535] = 10,	-- Blood Shield (DK)
+	[48707] = 5,	-- Anti-Magic Shell
+	[51052] = 10,	-- Anti-Magic Zone
+	[51271] = 20,	-- Pillar of Frost
+	[77535] = 10,	-- Blood Shield
 	-- Druid
-	[62606] = 10,	-- Savage Defense proc. (Druid) Tooltip of the original spell doesn't clearly state that this is an absorb, but the buff does.
+	[62606] = 10,	-- Savage Defense
 	-- Mage
 	[11426] = 60,	-- Ice Barrier
-	[6143] = 30,	-- Frost Ward
-	[1463] = 60,	-- Mana shield
-	[543] = 30,		-- Fire Ward
+	[1463] = 60,	-- Mana Shield
+	[543] = 30,		-- Mage Ward
 	-- Paladin
-	[58597] = 6,	-- Sacred Shield (Paladin) proc (Fixed, thanks to Julith)
-	[86273] = 6,	-- Illuminated Healing, Pala Mastery
+	[85285] = 15,	-- Sacred Shield
+	[76669] = 15,	-- Illuminated Healing
 	-- Priest
-	[17] = 30,		-- Power Word: Shield
-	[47753] = 12,	-- Divine Aegis
-	[47788] = 10,	-- Guardian Spirit  (Priest) (50 nominal absorb, this may not show in the CL)
+	[17] = 15,		-- Power Word: Shield
+	[47515] = 15,	-- Divine Aegis
+	[47788] = 10,	-- Guardian Spirit
 	-- Warlock
 	[7812] = 30,	-- Sacrifice
 	[6229] = 30,	-- Shadow Ward
 	-- Item procs
-	[64411] = 15,	-- Blessing of the Ancient (Val'anyr Hammer of Ancient Kings equip effect)
-	[64413] = 8,	-- Val'anyr, Hammer of Ancient Kings proc Protection of Ancient Kings
+	[64411] = 15,	-- Blessing of Ancient Kings
+	[64413] = 8,	-- Protection of Ancient Kings
 }
 local shields = {}
 
@@ -75,11 +74,11 @@ local dummy = function() return end
 
 local truncate = function(value)
 	if value >= 1e6 then
-		return string.format('%.2fm', value / 1e6)
+		return string.format("%.2fm", value / 1e6)
 	elseif value >= 1e4 then
-		return string.format('%.1fk', value / 1e3)
+		return string.format("%.1fk", value / 1e3)
 	else
-		return string.format('%.0f', value)
+		return string.format("%.0f", value)
 	end
 end
 
@@ -100,7 +99,7 @@ local IsUnitInCombat = function(uGUID)
 end
 
 local CreateFS = function(frame)
-	local fstring = frame:CreateFontString(nil, 'OVERLAY')
+	local fstring = frame:CreateFontString(nil, "OVERLAY")
 	fstring:SetFont(font, font_size, font_style)
 	fstring:SetShadowColor(0, 0, 0, 1)
 	fstring:SetShadowOffset(0, 0)
@@ -142,50 +141,51 @@ local report = function(channel, cn)
 end
 
 StaticPopupDialogs[addon_name.."ReportDialog"] = {
-	text = "", 
-	button1 = ACCEPT, 
+	text = "",
+	button1 = ACCEPT,
 	button2 = CANCEL,
 	hasEditBox = 1,
-	timeout = 30, 
-	hideOnEscape = 1, 
+	timeout = 30,
+	hideOnEscape = 1,
+	preferredIndex = 3,
 }
 
 local reportList = {
 	{
-		text = CHAT_LABEL, 
+		text = CHAT_LABEL,
 		func = function() report("Chat") end,
 	},
 	{
-		text = SAY, 
+		text = SAY,
 		func = function() report("SAY") end,
 	},
 	{
-		text = PARTY, 
+		text = PARTY,
 		func = function() report("PARTY") end,
 	},
 	{
-		text = RAID, 
+		text = RAID,
 		func = function() report("RAID") end,
 	},
 	{
-		text = OFFICER, 
+		text = OFFICER,
 		func = function() report("OFFICER") end,
 	},
 	{
-		text = GUILD, 
+		text = GUILD,
 		func = function() report("GUILD") end,
 	},
 	{
-		text = TARGET, 
-		func = function() 
+		text = TARGET,
+		func = function()
 			if UnitExists("target") and UnitIsPlayer("target") then
 				report("WHISPER", UnitName("target"))
 			end
 		end,
 	},
 	{
-		text = PLAYER.."..", 
-		func = function() 
+		text = PLAYER.."..",
+		func = function()
 			StaticPopupDialogs[addon_name.."ReportDialog"].OnAccept = function(self)
 				report("WHISPER", _G[self:GetName().."EditBox"]:GetText())
 			end
@@ -193,8 +193,8 @@ local reportList = {
 		end,
 	},
 	{
-		text = CHANNEL.."..", 
-		func = function() 
+		text = CHANNEL.."..",
+		func = function()
 			StaticPopupDialogs[addon_name.."ReportDialog"].OnAccept = function(self)
 				report("CHANNEL", _G[self:GetName().."EditBox"]:GetText())
 			end
@@ -214,7 +214,7 @@ local OnBarEnter = function(self)
 	end
 	table.sort(a, function(a, b) return a[2] > b[2] end)
 	for _, v in pairs(a) do
-		GameTooltip:AddDoubleLine(v[1], string.format("%d (%.1f%%)", v[2], v[2]/amount*100), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(v[1], string.format("%d (%.1f%%)", v[2], v[2] / amount * 100), 1, 1, 1, 1, 1, 1)
 	end
 	wipe(a)
 	GameTooltip:AddLine(TARGET)
@@ -223,7 +223,7 @@ local OnBarEnter = function(self)
 	end
 	table.sort(a, function(a, b) return a[2] > b[2] end)
 	for _, v in pairs(a) do
-		GameTooltip:AddDoubleLine(v[1], string.format("%d (%.1f%%)", v[2], v[2]/amount*100), 1, 1, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(v[1], string.format("%d (%.1f%%)", v[2], v[2] / amount * 100), 1, 1, 1, 1, 1, 1)
 	end
 	GameTooltip:Show()
 end
@@ -238,21 +238,21 @@ local CreateBar = function()
 	newbar:SetMinMaxValues(0, 100)
 	newbar:SetWidth(width)
 	newbar:SetHeight(barheight)
-	
+
 	newbar.bg = newbar:CreateTexture(nil, "BORDER")
 	newbar.bg:SetAllPoints(newbar)
 	newbar.bg:SetTexture(texture)
-	
+
 	newbar.backgdrop = CreateFrame("Frame", nil, newbar)
 	newbar.backgdrop:SetTemplate("Default")
 	newbar.backgdrop:SetFrameStrata("BACKGROUND")
 	newbar.backgdrop:SetPoint("TOPLEFT", -2, 2)
 	newbar.backgdrop:SetPoint("BOTTOMRIGHT", 2, -2)
-	
+
 	newbar.left = CreateFS(newbar)
 	newbar.left:SetPoint("LEFT", 3, (0.5 * UIParent:GetEffectiveScale())-1)
 	newbar.left:SetJustifyH("LEFT")
-	
+
 	newbar.right = CreateFS(newbar)
 	newbar.right:SetPoint("RIGHT", 1, (0.5 * UIParent:GetEffectiveScale())-1)
 	newbar.right:SetJustifyH("RIGHT")
@@ -260,7 +260,7 @@ local CreateBar = function()
 	newbar:SetScript("OnLeave", OnBarLeave)
 	newbar:SetScript("OnMouseUp", function(self, button)
 		if button == "RightButton" then
-			ToggleDropDownMenu(1, nil, menuFrame, 'cursor', 0, 0)
+			ToggleDropDownMenu(1, nil, menuFrame, "cursor", 0, 0)
 		end
 	end)
 	return newbar
@@ -437,7 +437,7 @@ local CreateMenu = function(self, level)
 end
 
 local EndCombat = function()
-	MainFrame:SetScript('OnUpdate', nil)
+	MainFrame:SetScript("OnUpdate", nil)
 	combatstarted = false
 	local fname = bossname or mobname
 	if fname then
@@ -542,7 +542,7 @@ local StartCombat = function()
 	wipe(current)
 	combatstarted = true
 	ResetDisplay(current)
-	MainFrame:SetScript('OnUpdate', OnUpdate)
+	MainFrame:SetScript("OnUpdate", OnUpdate)
 end
 
 local FindShielder = function(destGUID, timestamp)
@@ -569,7 +569,7 @@ end
 local OnEvent = function(self, event, ...)
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
-		if eventType=="SPELL_SUMMON" and (band(sourceFlags, raidFlags) ~= 0 or band(sourceFlags, npcFlags) ~= 0 or band(sourceFlags, petFlags) ~= 0 or band(destFlags, petFlags) ~= 0) then
+		if eventType == "SPELL_SUMMON" and (band(sourceFlags, raidFlags) ~= 0 or band(sourceFlags, npcFlags) ~= 0 or band(sourceFlags, petFlags) ~= 0 or band(destFlags, petFlags) ~= 0) then
 			if owners[sourceGUID] then
 				owners[destGUID] = owners[sourceGUID]
 			else
@@ -583,9 +583,9 @@ local OnEvent = function(self, event, ...)
 			end
 		end
 		if band(sourceFlags, raidFlags) == 0 and band(destFlags, raidFlags) == 0 and band(sourceFlags, petFlags) == 0 and band(destFlags, petFlags) == 0 then return end
-		if eventType=="SWING_DAMAGE" or eventType=="RANGE_DAMAGE" or eventType=="SPELL_DAMAGE" or eventType=="SPELL_PERIODIC_DAMAGE" or eventType=="DAMAGE_SHIELD" then
-			local amount, _, _, _, _, absorbed = select(eventType=="SWING_DAMAGE" and 12 or 15, ...)
-			local spellName = eventType=="SWING_DAMAGE" and MELEE_ATTACK or select(13, ...)
+		if eventType == "SWING_DAMAGE" or eventType == "RANGE_DAMAGE" or eventType == "SPELL_DAMAGE" or eventType == "SPELL_PERIODIC_DAMAGE" or eventType == "DAMAGE_SHIELD" then
+			local amount, _, _, _, _, absorbed = select(eventType == "SWING_DAMAGE" and 12 or 15, ...)
+			local spellName = eventType == "SWING_DAMAGE" and MELEE_ATTACK or select(13, ...)
 			if IsFriendlyUnit(sourceGUID) and not IsFriendlyUnit(destGUID) and combatstarted then
 				if amount and amount > 0 then
 					if owners[sourceGUID] then
@@ -606,15 +606,15 @@ local OnEvent = function(self, event, ...)
 					Add(shielder, absorbed, mergeHealAbsorbs and SHOW_COMBAT_HEALING or COMBAT_TEXT_ABSORB, shield, destName)
 				end
 			end
-		elseif eventType=="SWING_MISSED" or eventType=="RANGE_MISSED" or eventType=="SPELL_MISSED" or eventType=="SPELL_PERIODIC_MISSED" then
-			local misstype, amount = select(eventType=="SWING_MISSED" and 12 or 15, ...)
+		elseif eventType == "SWING_MISSED" or eventType == "RANGE_MISSED" or eventType == "SPELL_MISSED" or eventType == "SPELL_PERIODIC_MISSED" then
+			local misstype, amount = select(eventType == "SWING_MISSED" and 12 or 15, ...)
 			if misstype == "ABSORB" and IsFriendlyUnit(destGUID) then
 				local shielder, shield = FindShielder(destGUID, timestamp)
 				if shielder and amount and amount > 0 then
 					Add(shielder, amount, mergeHealAbsorbs and SHOW_COMBAT_HEALING or COMBAT_TEXT_ABSORB, shield, destName)
 				end
 			end
-		elseif eventType=="SPELL_HEAL" or eventType=="SPELL_PERIODIC_HEAL" then
+		elseif eventType == "SPELL_HEAL" or eventType == "SPELL_PERIODIC_HEAL" then
 			spellId, spellName, spellSchool, amount, over, school, resist = select(12, ...)
 			if IsFriendlyUnit(sourceGUID) and IsFriendlyUnit(destGUID) and combatstarted then
 				over = over or 0
@@ -623,17 +623,17 @@ local OnEvent = function(self, event, ...)
 					Add(sourceGUID, amount - over, SHOW_COMBAT_HEALING, spellName, destName)
 				end
 			end
-		elseif eventType=="SPELL_DISPEL" then
+		elseif eventType == "SPELL_DISPEL" then
 			if IsFriendlyUnit(sourceGUID) and combatstarted then
 				sourceGUID = owners[sourceGUID] or sourceGUID
 				Add(sourceGUID, 1, DISPELS, "Dispel", destName)
 			end
-		elseif eventType=="SPELL_INTERRUPT" then
+		elseif eventType == "SPELL_INTERRUPT" then
 			if IsFriendlyUnit(sourceGUID) and not IsFriendlyUnit(destGUID) and combatstarted then
 				sourceGUID = owners[sourceGUID] or sourceGUID
 				Add(sourceGUID, 1, INTERRUPTS, "Interrupt", destName)
 			end
-		elseif eventType=="SPELL_AURA_APPLIED" or eventType=="SPELL_AURA_REFRESH" then
+		elseif eventType == "SPELL_AURA_APPLIED" or eventType == "SPELL_AURA_REFRESH" then
 			local spellId, spellName = select(12, ...)
 			sourceGUID = owners[sourceGUID] or sourceGUID
 			if AbsorbSpellDuration[spellId] and IsFriendlyUnit(sourceGUID) and IsFriendlyUnit(destGUID) then
@@ -641,7 +641,7 @@ local OnEvent = function(self, event, ...)
 				shields[destGUID][spellName] = shields[destGUID][spellName] or {}
 				shields[destGUID][spellName][sourceGUID] = timestamp + AbsorbSpellDuration[spellId]
 			end
-		elseif eventType=="SPELL_AURA_REMOVED" then
+		elseif eventType == "SPELL_AURA_REMOVED" then
 			local spellId, spellName = select(12, ...)
 			sourceGUID = owners[sourceGUID] or sourceGUID
 			if AbsorbSpellDuration[spellId] and IsFriendlyUnit(destGUID) then
@@ -668,7 +668,7 @@ local OnEvent = function(self, event, ...)
 			end)
 			MainFrame:SetScript("OnMouseUp", function(self, button)
 				if button == "RightButton" then
-					ToggleDropDownMenu(1, nil, menuFrame, 'cursor', 0, 0)
+					ToggleDropDownMenu(1, nil, menuFrame, "cursor", 0, 0)
 				end
 				if button == "LeftButton" then
 					self:StopMovingOrSizing()
@@ -700,7 +700,7 @@ local OnEvent = function(self, event, ...)
 end
 
 local addon = CreateFrame("Frame", nil, UIParent)
-addon:SetScript('OnEvent', OnEvent)
+addon:SetScript("OnEvent", OnEvent)
 addon:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 addon:RegisterEvent("ADDON_LOADED")
 addon:RegisterEvent("VARIABLES_LOADED")
@@ -713,10 +713,11 @@ addon:RegisterEvent("UNIT_PET")
 SlashCmdList["alDamage"] = function(msg)
 	for i = 1, 20 do
 		units[i] = {name = UnitName("player"), class = select(2, UnitClass("player")), unit = "1"}
-		Add(i, i*10000, DAMAGE)
+		Add(i, i * 10000, DAMAGE)
 		units[i] = nil
 	end
 	display = current
 	UpdateBars()
 end
 SLASH_alDamage1 = "/aldmg"
+SLASH_alDamage2 = "/фдвьп"
