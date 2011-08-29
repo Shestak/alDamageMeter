@@ -29,8 +29,9 @@ local current, total, display, fights = {}, {}, {}, {}
 local timer, num, offset = 0, 0, 0
 local MainFrame
 local combatstarted = false
-local filter = COMBATLOG_OBJECT_AFFILIATION_RAID + COMBATLOG_OBJECT_AFFILIATION_PARTY + COMBATLOG_OBJECT_AFFILIATION_MINE
-local filpet = COMBATLOG_OBJECT_TYPE_PET + COMBATLOG_OBJECT_TYPE_GUARDIAN
+local raidFlags = COMBATLOG_OBJECT_AFFILIATION_RAID + COMBATLOG_OBJECT_AFFILIATION_PARTY + COMBATLOG_OBJECT_AFFILIATION_MINE
+local petFlags = COMBATLOG_OBJECT_TYPE_PET + COMBATLOG_OBJECT_TYPE_GUARDIAN
+local npcFlags = COMBATLOG_OBJECT_TYPE_NPC+COMBATLOG_OBJECT_CONTROL_NPC
 local displayMode = {
 	DAMAGE,
 	SHOW_COMBAT_HEALING,
@@ -558,16 +559,39 @@ local FindShielder = function(destGUID, timestamp)
 	return found_shielder, found_shield
 end
 
+local IsUnitOrPet = function(flags)
+	if band(flags, raidFlags) ~= 0 or band(flags, petFlags) ~= 0 then
+		return true
+	end
+	return false
+end
+
 local OnEvent = function(self, event, ...)
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = select(1, ...)
-		if band(sourceFlags, filter) == 0 and band(destFlags, filter) == 0 then return end
+		if eventType=="SPELL_SUMMON" and (band(sourceFlags, raidFlags) ~= 0 or band(sourceFlags, npcFlags) ~= 0 or band(sourceFlags, petFlags) ~= 0 or band(destFlags, petFlags) ~= 0) then
+			if owners[sourceGUID] then
+				owners[destGUID] = owners[sourceGUID]
+			else
+				owners[destGUID] = sourceGUID
+				for pet, owner in pairs(owners) do
+					if owners[owner] then
+						owners[pet] = owners[owner]
+						break
+					end
+				end
+			end
+		end
+		if band(sourceFlags, raidFlags) == 0 and band(destFlags, raidFlags) == 0 and band(sourceFlags, petFlags) == 0 and band(destFlags, petFlags) == 0 then return end
 		if eventType=="SWING_DAMAGE" or eventType=="RANGE_DAMAGE" or eventType=="SPELL_DAMAGE" or eventType=="SPELL_PERIODIC_DAMAGE" or eventType=="DAMAGE_SHIELD" then
 			local amount, _, _, _, _, absorbed = select(eventType=="SWING_DAMAGE" and 12 or 15, ...)
 			local spellName = eventType=="SWING_DAMAGE" and MELEE_ATTACK or select(13, ...)
 			if IsFriendlyUnit(sourceGUID) and not IsFriendlyUnit(destGUID) and combatstarted then
 				if amount and amount > 0 then
-					sourceGUID = owners[sourceGUID] or sourceGUID
+					if owners[sourceGUID] then
+						sourceGUID = owners[sourceGUID]
+						spellName = PET..": "..spellName
+					end
 					Add(sourceGUID, amount, DAMAGE, spellName, destName)
 					if not bossname and boss.BossIDs[tonumber(destGUID:sub(9, 12), 16)] then
 						bossname = destName
@@ -588,18 +612,6 @@ local OnEvent = function(self, event, ...)
 				local shielder, shield = FindShielder(destGUID, timestamp)
 				if shielder and amount and amount > 0 then
 					Add(shielder, amount, mergeHealAbsorbs and SHOW_COMBAT_HEALING or COMBAT_TEXT_ABSORB, shield, destName)
-				end
-			end
-		elseif eventType=="SPELL_SUMMON" then
-			if owners[sourceGUID] then 
-				owners[destGUID] = owners[sourceGUID]
-			else
-				owners[destGUID] = sourceGUID
-				for pet, owner in pairs(owners) do
-					if owners[owner] then
-						owners[pet] = owners[owner]
-						break
-					end
 				end
 			end
 		elseif eventType=="SPELL_HEAL" or eventType=="SPELL_PERIODIC_HEAL" then
