@@ -268,6 +268,7 @@ end
 
 local CreateUnitInfo = function(uGUID)
 	local unit = units[uGUID]
+	if not unit then return end
 	local newdata = {
 		name = unit.name,
 		class = unit.class,
