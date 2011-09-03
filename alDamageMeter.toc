@@ -1,8 +1,8 @@
 ## Interface: 40200
-## Author: Allez
 ## Title: alDamageMeter
-## Version: 40200.5
 ## Notes: Damage meter
+## Author: Allez
+## Version: 40200.6
 ## RequiredDeps: ShestakUI
 
 lib\LibStub\LibStub.lua

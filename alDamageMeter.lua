@@ -14,9 +14,7 @@ local font = C.font.stylization_font
 local font_style = C.font.stylization_font_style
 local font_size = C.font.stylization_font_size
 local hidetitle = true
-local classcolorbar = true
 local onlyboss = false
-local classcolorname = false
 local mergeHealAbsorbs = true
 -- Config end
 
@@ -83,7 +81,7 @@ local truncate = function(value)
 end
 
 local IsFriendlyUnit = function(uGUID)
-	if units[uGUID] or owners[uGUID] or uGUID==UnitGUID("player") then
+	if units[uGUID] or (owners[uGUID] and units[owners[uGUID]]) or uGUID == UnitGUID("player") then
 		return true
 	else
 		return false
@@ -658,6 +656,7 @@ local OnEvent = function(self, event, ...)
 		if name == addon_name then
 			self:UnregisterEvent(event)
 			MainFrame = CreateFrame("Frame", addon_name.."Frame", UIParent)
+			MainFrame:SetSize(width, height)
 			MainFrame:SetPoint(anchor, x, y)
 			MainFrame:SetMovable(true)
 			MainFrame:EnableMouse(true)
@@ -677,16 +676,14 @@ local OnEvent = function(self, event, ...)
 			end)
 			MainFrame:SetScript("OnMouseWheel", OnMouseWheel)
 			MainFrame:Show()
+			if not hidetitle then
+				MainFrame.title = CreateFS(MainFrame)
+				MainFrame.title:SetPoint("BOTTOMLEFT", MainFrame, "TOPLEFT", 0, 4)
+				MainFrame.title:SetText(sMode)
+			end
 			UIDropDownMenu_Initialize(menuFrame, CreateMenu, "MENU")
 			CheckRoster()
 		end
-	elseif event == "VARIABLES_LOADED" then
-		if not hidetitle then
-			MainFrame.title = CreateFS(MainFrame)
-			MainFrame.title:SetPoint("BOTTOMLEFT", MainFrame, "TOPLEFT", 0, 4)
-			MainFrame.title:SetText(sMode)
-		end
-		MainFrame:SetSize(width, height)
 	elseif event == "RAID_ROSTER_UPDATE" or event == "PARTY_MEMBERS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
 		CheckRoster()
 	elseif event == "PLAYER_REGEN_DISABLED" then
