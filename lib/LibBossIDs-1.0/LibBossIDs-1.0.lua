@@ -1,6 +1,6 @@
 ﻿--[[
 Name: LibBossIDs-1.0
-Revision: $Revision: 69 $
+Revision: $Revision: 70 $
 Author: Elsia
 Website: http://www.wowace.com/addons/libbossids-1-0/
 Documentation:
@@ -343,6 +343,15 @@ local BossIDs = {
 	[27483] = true,	-- King Dred
 	[26632] = true,	-- The Prophet Tharon'ja
 	[27696] = true,	-- The Prophet Tharon'ja
+
+	-------------------------------------------------------------------------------
+	-- End Time 4.3
+	-------------------------------------------------------------------------------
+	[54431] = true,	-- Echo of Baine
+	[54445] = true,	-- Echo of Jaina
+	[54123] = true,	-- Echo of Sylvanas
+	[54544] = true,	-- Echo of Tyrande
+	[54432] = true,	-- Murozond
 
 	-------------------------------------------------------------------------------
 	-- Firelands
