@@ -1,6 +1,6 @@
 ﻿--[[
 Name: LibBossIDs-1.0
-Revision: $Revision: 70 $
+Revision: $Revision: 72 $
 Author: Elsia
 Website: http://www.wowace.com/addons/libbossids-1-0/
 Documentation:
@@ -10,7 +10,7 @@ Dependencies: LibStub
 License: Public Domain, Absolutely no Warranty.
 ]]
 
-local MAJOR, MINOR = "LibBossIDs-1.0", "$Revision: 69 $"
+local MAJOR, MINOR = "LibBossIDs-1.0", "$Revision: 72 $"
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -1291,6 +1291,14 @@ local BossIDs = {
 	[33993] = true,	-- Emalon the Storm Watcher
 	[35013] = true,	-- Koralon the Flamewatcher
 	[38433] = true,	-- Toravon the Ice Watcher
+
+	-------------------------------------------------------------------------------
+	-- Well of Eternity 4.3
+	-------------------------------------------------------------------------------
+	[55085] = true,	-- Peroth'arn
+	[54853] = true,	-- Queen Azshara
+	[54969] = true,	-- Mannoroth
+	[55419] = true,	-- Captain Varo'then
 
 	-------------------------------------------------------------------------------
 	-- Winterspring
