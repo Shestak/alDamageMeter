@@ -254,6 +254,7 @@ local CreateBar = function()
 	newbar.right = CreateFS(newbar)
 	newbar.right:SetPoint("RIGHT", 1, (0.5 * UIParent:GetEffectiveScale())-1)
 	newbar.right:SetJustifyH("RIGHT")
+
 	newbar:SetScript("OnEnter", OnBarEnter)
 	newbar:SetScript("OnLeave", OnBarLeave)
 	newbar:SetScript("OnMouseUp", function(self, button)

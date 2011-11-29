@@ -1,6 +1,6 @@
 ﻿--[[
 Name: LibBossIDs-1.0
-Revision: $Revision: 72 $
+Revision: $Revision: 74 $
 Author: Elsia
 Website: http://www.wowace.com/addons/libbossids-1-0/
 Documentation:
@@ -113,6 +113,7 @@ local BossIDs = {
 	-------------------------------------------------------------------------------
 	[47120] = true,	-- Argaloth
 	[52363] = true,	-- Occu'thar
+	[55869] = true,	-- Alizabal
 
 	-------------------------------------------------------------------------------
 	-- Blackfathom Deeps
@@ -345,7 +346,7 @@ local BossIDs = {
 	[27696] = true,	-- The Prophet Tharon'ja
 
 	-------------------------------------------------------------------------------
-	-- End Time 4.3
+	-- End Time
 	-------------------------------------------------------------------------------
 	[54431] = true,	-- Echo of Baine
 	[54445] = true,	-- Echo of Jaina
@@ -481,7 +482,7 @@ local BossIDs = {
 	[12397] = true,	-- Lord Kazzak
 
 	-------------------------------------------------------------------------------
-	-- Hour of Twilight 4.3
+	-- Hour of Twilight
 	-------------------------------------------------------------------------------
 	[54590] = true,	-- Arcurion
 	[54968] = true,	-- Asira Dawnslayer
@@ -1036,6 +1037,18 @@ local BossIDs = {
 	[49541] = true,	-- Vanessa VanCleef
 
 	-------------------------------------------------------------------------------
+	-- Dragon Soul
+	-------------------------------------------------------------------------------
+	[55265] = true,	-- Morchok
+	[55308] = true,	-- Warlord Zonozz
+	[55312] = true,	-- Yor'sahj the Unsleeping
+	[55689] = true,	-- Hagara the Binder
+	[55294] = true,	-- Ultraxion
+	[39399] = true,	-- Warmaster Blackhorn
+	[53879] = true,	-- Spine Deathwing
+	[56173] = true,	-- Madness Deathwing
+
+	-------------------------------------------------------------------------------
 	-- The Eye of Eternity
 	-------------------------------------------------------------------------------
 	[28859] = true,	-- Malygos
@@ -1293,7 +1306,7 @@ local BossIDs = {
 	[38433] = true,	-- Toravon the Ice Watcher
 
 	-------------------------------------------------------------------------------
-	-- Well of Eternity 4.3
+	-- Well of Eternity
 	-------------------------------------------------------------------------------
 	[55085] = true,	-- Peroth'arn
 	[54853] = true,	-- Queen Azshara
