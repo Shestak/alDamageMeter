@@ -1,6 +1,6 @@
 ﻿--[[
 Name: LibBossIDs-1.0
-Revision: $Revision: 74 $
+Revision: $Revision: 76 $
 Author: Elsia
 Website: http://www.wowace.com/addons/libbossids-1-0/
 Documentation:
@@ -10,7 +10,7 @@ Dependencies: LibStub
 License: Public Domain, Absolutely no Warranty.
 ]]
 
-local MAJOR, MINOR = "LibBossIDs-1.0", "$Revision: 72 $"
+local MAJOR, MINOR = "LibBossIDs-1.0", "$Revision: 76 $"
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -1164,7 +1164,7 @@ local BossIDs = {
 	[34447] = true,	-- Caiphus the Stern <Priest>
 	[34441] = true,	-- Vivienne Blackwhisper <Priest>
 	[34454] = true,	-- Maz'dinah <Rogue>
-	[34444] = true,	-- Thrakgar	<Shaman>
+	[34444] = true,	-- Thrakgar <Shaman>
 	[34455] = true,	-- Broln Stouthorn <Shaman>
 	[34450] = true,	-- Harkzog <Warlock>
 	[34453] = true,	-- Narrhok Steelbreaker <Warrior>
