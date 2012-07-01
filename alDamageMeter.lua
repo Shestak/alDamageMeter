@@ -323,7 +323,7 @@ local UpdateBars = function()
 		bar[i]:SetStatusBarColor(color.r, color.g, color.b)
 		bar[i].bg:SetVertexColor(color.r, color.g, color.b, 0.25)
 		if sMode == DAMAGE or sMode == SHOW_COMBAT_HEALING then
-			bar[i].right:SetFormattedText("%s [%.0f]", truncate(cur[sMode].amount), perSecond(cur))
+			bar[i].right:SetFormattedText("%s [%s]", truncate(cur[sMode].amount), truncate(perSecond(cur)))
 		else
 			bar[i].right:SetFormattedText("%s", truncate(cur[sMode].amount))
 		end
