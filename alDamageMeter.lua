@@ -469,12 +469,12 @@ end
 
 local CheckRoster = function()
 	wipe(units)
-	if GetNumRaidMembers() > 0 then
-		for i = 1, GetNumRaidMembers(), 1 do
+	if GetNumGroupMembers() > 0 then
+		for i = 1, GetNumGroupMembers(), 1 do
 			CheckUnit("raid"..i)
 		end
-	elseif GetNumPartyMembers() > 0 then
-		for i = 1, GetNumPartyMembers(), 1 do
+	elseif GetNumSubgroupMembers() > 0 then
+		for i = 1, GetNumSubgroupMembers(), 1 do
 			CheckUnit("party"..i)
 		end
 	end
@@ -482,14 +482,14 @@ local CheckRoster = function()
 end
 
 local IsRaidInCombat = function()
-	if GetNumRaidMembers() > 0 then
-		for i = 1, GetNumRaidMembers(), 1 do
+	if GetNumGroupMembers() > 0 then
+		for i = 1, GetNumGroupMembers(), 1 do
 			if UnitExists("raid"..i) and UnitAffectingCombat("raid"..i) then
 				return true
 			end
 		end
-	elseif GetNumPartyMembers() > 0 then
-		for i = 1, GetNumPartyMembers(), 1 do
+	elseif GetNumSubgroupMembers() > 0 then
+		for i = 1, GetNumSubgroupMembers(), 1 do
 			if UnitExists("party"..i) and UnitAffectingCombat("party"..i) then
 				return true
 			end
@@ -673,7 +673,7 @@ local OnEvent = function(self, event, ...)
 			UIDropDownMenu_Initialize(menuFrame, CreateMenu, "MENU")
 			CheckRoster()
 		end
-	elseif event == "RAID_ROSTER_UPDATE" or event == "PARTY_MEMBERS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
+	elseif event == "GROUP_ROSTER_UPDATE" or event == "PLAYER_ENTERING_WORLD" then
 		CheckRoster()
 	elseif event == "PLAYER_REGEN_DISABLED" then
 		if not combatstarted then
@@ -691,8 +691,7 @@ addon:SetScript("OnEvent", OnEvent)
 addon:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 addon:RegisterEvent("ADDON_LOADED")
 addon:RegisterEvent("VARIABLES_LOADED")
-addon:RegisterEvent("RAID_ROSTER_UPDATE")
-addon:RegisterEvent("PARTY_MEMBERS_CHANGED")
+addon:RegisterEvent("GROUP_ROSTER_UPDATE")
 addon:RegisterEvent("PLAYER_ENTERING_WORLD")
 addon:RegisterEvent("PLAYER_REGEN_DISABLED")
 addon:RegisterEvent("UNIT_PET")
