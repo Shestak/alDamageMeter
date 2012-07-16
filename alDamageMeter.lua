@@ -319,7 +319,7 @@ local UpdateBars = function()
 		end
 		bar[i].id = i + offset
 		bar[i]:SetValue(100 * cur[sMode].amount / max[sMode].amount)
-		color = CUSTOM_CLASS_COLORS[cur.class] or RAID_CLASS_COLORS[cur.class]
+		color = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[cur.class] or RAID_CLASS_COLORS[cur.class]
 		bar[i]:SetStatusBarColor(color.r, color.g, color.b)
 		bar[i].bg:SetVertexColor(color.r, color.g, color.b, 0.25)
 		if sMode == DAMAGE or sMode == SHOW_COMBAT_HEALING then
