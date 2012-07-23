@@ -313,7 +313,7 @@ local UpdateBars = function()
 		max = display[barguids[1]]
 		if i > maxbars or not cur then break end
 		if cur[sMode].amount == 0 then break end
-		if not bar[i] then 
+		if not bar[i] then
 			bar[i] = CreateBar()
 			bar[i]:SetPoint("TOP", 0, -(barheight + spacing) * (i-1))
 		end
