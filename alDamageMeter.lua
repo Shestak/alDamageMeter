@@ -1,4 +1,4 @@
-﻿local T, C, L = unpack(ShestakUI)
+﻿local T, C, L, _ = unpack(ShestakUI)
 
 -- Config start
 local anchor = "LEFT"
@@ -45,13 +45,12 @@ local AbsorbSpellDuration = {
 	[51271] = 20,	-- Pillar of Frost
 	[77535] = 10,	-- Blood Shield
 	-- Druid
-	[62606] = 10,	-- Savage Defense
+	[62606] = 6,	-- Savage Defense
 	-- Mage
 	[11426] = 60,	-- Ice Barrier
-	[1463] = 60,	-- Mana Shield
-	[543] = 30,		-- Mage Ward
+	[1463] = 8,		-- Mana Shield
 	-- Paladin
-	[85285] = 15,	-- Sacred Shield
+	[65148] = 30,	-- Sacred Shield
 	[76669] = 15,	-- Illuminated Healing
 	-- Priest
 	[17] = 15,		-- Power Word: Shield
@@ -259,7 +258,7 @@ local CreateBar = function()
 	newbar:SetScript("OnLeave", OnBarLeave)
 	newbar:SetScript("OnMouseUp", function(self, button)
 		if button == "RightButton" then
-			ToggleDropDownMenu(1, nil, menuFrame, "cursor", 0, 0)
+			ToggleDropDownMenu(nil, nil, menuFrame, "cursor", 0, 0)
 		end
 	end)
 	return newbar
@@ -469,12 +468,12 @@ end
 
 local CheckRoster = function()
 	wipe(units)
-	if GetNumGroupMembers() > 0 then
+	if GetNumGroupMembers() > 5 then
 		for i = 1, GetNumGroupMembers(), 1 do
 			CheckUnit("raid"..i)
 		end
-	elseif GetNumSubgroupMembers() > 0 then
-		for i = 1, GetNumSubgroupMembers(), 1 do
+	elseif GetNumGroupMembers() > 0 then
+		for i = 1, GetNumGroupMembers(), 1 do
 			CheckUnit("party"..i)
 		end
 	end
@@ -482,14 +481,14 @@ local CheckRoster = function()
 end
 
 local IsRaidInCombat = function()
-	if GetNumGroupMembers() > 0 then
+	if GetNumGroupMembers() > 5 then
 		for i = 1, GetNumGroupMembers(), 1 do
 			if UnitExists("raid"..i) and UnitAffectingCombat("raid"..i) then
 				return true
 			end
 		end
-	elseif GetNumSubgroupMembers() > 0 then
-		for i = 1, GetNumSubgroupMembers(), 1 do
+	elseif GetNumGroupMembers() > 0 then
+		for i = 1, GetNumGroupMembers(), 1 do
 			if UnitExists("party"..i) and UnitAffectingCombat("party"..i) then
 				return true
 			end
