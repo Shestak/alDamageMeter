@@ -2,7 +2,7 @@
 ## Title: alDamageMeter
 ## Notes: Damage meter
 ## Author: Allez
-## Version: 50001.10
+## Version: 50001.11
 ## RequiredDeps: ShestakUI
 
 lib\LibStub\LibStub.lua
