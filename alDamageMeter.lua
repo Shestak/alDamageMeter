@@ -116,7 +116,7 @@ local perSecond = function(cdata)
 end
 
 local report = function(channel, cn)
-	local message = sMode..":"
+	local message = addon_name.." : "..sMode
 	if channel == "Chat" then
 		DEFAULT_CHAT_FRAME:AddMessage(message)
 	else
