@@ -468,28 +468,20 @@ end
 
 local CheckRoster = function()
 	wipe(units)
-	if GetNumGroupMembers() > 5 then
+	if GetNumGroupMembers() > 0 then
+		local unit = IsInRaid() and "raid" or "party"
 		for i = 1, GetNumGroupMembers(), 1 do
-			CheckUnit("raid"..i)
-		end
-	elseif GetNumGroupMembers() > 0 then
-		for i = 1, GetNumGroupMembers(), 1 do
-			CheckUnit("party"..i)
+			CheckUnit(unit..i)
 		end
 	end
 	CheckUnit("player")
 end
 
 local IsRaidInCombat = function()
-	if GetNumGroupMembers() > 5 then
+	if GetNumGroupMembers() > 0 then
+		local unit = IsInRaid() and "raid" or "party"
 		for i = 1, GetNumGroupMembers(), 1 do
-			if UnitExists("raid"..i) and UnitAffectingCombat("raid"..i) then
-				return true
-			end
-		end
-	elseif GetNumGroupMembers() > 0 then
-		for i = 1, GetNumGroupMembers(), 1 do
-			if UnitExists("party"..i) and UnitAffectingCombat("party"..i) then
+			if UnitExists(unit..i) and UnitAffectingCombat(unit..i) then
 				return true
 			end
 		end
@@ -656,7 +648,7 @@ local OnEvent = function(self, event, ...)
 			end)
 			MainFrame:SetScript("OnMouseUp", function(self, button)
 				if button == "RightButton" then
-					ToggleDropDownMenu(1, nil, menuFrame, "cursor", 0, 0)
+					ToggleDropDownMenu(nil, nil, menuFrame, "cursor", 0, 0)
 				end
 				if button == "LeftButton" then
 					self:StopMovingOrSizing()
